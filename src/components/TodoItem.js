@@ -4,6 +4,24 @@ import { Component } from 'react';
 import styles from './TodoItem.module.css';
 
 class TodoItem extends Component {
+  state = {
+    editing: false,
+  };
+
+  handleEditing = () => {
+    this.setState({
+      editing: true,
+    });
+  };
+
+  handleUpdateDone = (e) => {
+    if (e.key === 'Enter') {
+      this.setState({
+        editing: false,
+      });
+    }
+  };
+
   render() {
     const completedStyle = {
       fontStyle: 'italic',
@@ -14,16 +32,35 @@ class TodoItem extends Component {
 
     const { id, title, completed } = this.props.todo;
 
+    let viewMode = {};
+    let editMode = {};
+
+    if (this.state.editing) {
+      viewMode.display = 'none';
+    } else {
+      editMode.display = 'none';
+    }
+
     return (
       <li className={styles.item}>
+        <div onDoubleClick={this.handleEditing} style={viewMode}>
+          <input
+            type='checkbox'
+            className={styles.checkbox}
+            checked={completed}
+            onChange={() => this.props.handleChangeProps(id)}
+          />
+          <span style={completed ? completedStyle : null}>{title}</span>
+          <button onClick={() => this.props.deleteTodoProps(id)}>Delete</button>
+        </div>
         <input
-          type='checkbox'
-          className={styles.checkbox}
-          checked={completed}
-          onChange={() => this.props.handleChangeProps(id)}
+          type='text'
+          className={styles.textInput}
+          style={editMode}
+          value={title}
+          onChange={(e) => this.props.setUpdate(e.target.value, id)}
+          onKeyDown={(e) => this.handleUpdateDone(e)}
         />
-        <span style={completed ? completedStyle : null}>{title}</span>
-        <button onClick={() => this.props.deleteTodoProps(id)}>Delete</button>
       </li>
     );
   }
